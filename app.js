@@ -10,10 +10,16 @@ const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'tr
 // create the Express app
 const app = express();
 
+//  creating the routes
+const usersRoute = require('./routes/user');
+const coursesRoute = require('./routes/course');
+
 // setup morgan which gives us http request logging
 app.use(morgan('dev'));
 
 // TODO setup your api routes here
+app.use('api', usersRoute);
+app.use('api', coursesRoute);
 
 // setup a friendly greeting for the root route
 app.get('/', (req, res) => {

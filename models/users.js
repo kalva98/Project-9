@@ -1,38 +1,57 @@
 'use strict'
 const Sequelize = require('sequelize');
-const db = require('../config/database');
 
-const Users = db.define('users', {
-    id: {
-        type: Sequelize.INTEGER,
-        validate: {
-            notEmpty: {
-                msg: "Title is required"
-            }
-        }
-    },
-    firstName: {
-        type: Sequelize.STRING,
-        validate: {
-            notEmpty: {
-                msg: "Name is required"
-            }
-        }
-    },
-    lastName: {
-        type: Sequelize.STRING
-    },
-    emailAddress: {
-        type: Sequelize.INTEGER,
-        validate: {
-            isEmail: {
-                msg: "Please enter email"
-            }
-        }
-    },
-    password: {
-        type: Sequelize.STRING
-    }
-})
+module.exports = (sequelize) => {
+    const Users = sequelize.define('Users', {
+        id: {
+            type: Sequelize.INTEGER,
+            validate: {
+                notEmpty: {
+                    msg: "Title is required",
+                },
+                primaryKey: true,
+                autoIncrement: true,
+            },
+        },
+        firstName: {
+            type: Sequelize.STRING,
+            validate: {
+                notEmpty: {
+                    msg: "Name is required",
+                },
+            },
+        },
+        lastName: {
+            type: Sequelize.STRING,
+            validate: {
+                notEmpty: {
+                    msg: "Name is required",
+                },
+            },
+        },
+        emailAddress: {
+            type: Sequelize.STRING,
+            validate: {
+                isEmail: {
+                    msg: "Please enter a vaid email",
+                },
+            },
+        },
+        password: {
+            type: Sequelize.STRING,
+        },
+    }, { sequelize });
 
-module.exports = Users;
+    Users.associate = (models) => {
+        //creating a one to many relationship
+        Users.hasMany(models.Courses, {
+            as: 'user',
+            foreignKey: {
+                fieldName: 'userId',
+                allowNull: false,
+            },
+        });
+    };
+
+    return Users;
+};
