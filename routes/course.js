@@ -1,21 +1,21 @@
 const express = require('express');
 const router = express.Router();
-const Course = require('../models/Course');
+//const Course = require('../models/Course');
 //--------------------------------------------------------------------------------------
 
-router.get('/api/courses', async (req, res) => {
-    try {
-        const books = await Books.findAll()
-        //await is not to move or do nothing until it gets the books.findall
-        res.render('books/index', {
-            books: books,
-            title: "Books"
-        });
-        //rendering the template, brings the books and title to the page
-    } catch (err) {
-        res.sendStatus(200);
-    }
-});
+// router.get('/api/courses', async (req, res) => {
+//     try {
+//         const books = await Books.findAll()
+//         //await is not to move or do nothing until it gets the books.findall
+//         res.render('books/index', {
+//             books: books,
+//             title: "Books"
+//         });
+//         //rendering the template, brings the books and title to the page
+//     } catch (err) {
+//         res.sendStatus(200);
+//     }
+// });
 
 // // GET /books/new - Shows the create book form
 // router.get('/new', (req, res) =>

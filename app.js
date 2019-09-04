@@ -18,8 +18,8 @@ const coursesRoute = require('./routes/course');
 app.use(morgan('dev'));
 
 // TODO setup your api routes here
-app.use('api', usersRoute);
-app.use('api', coursesRoute);
+app.use('/api', usersRoute);
+app.use('/api', coursesRoute);
 
 // setup a friendly greeting for the root route
 app.get('/', (req, res) => {

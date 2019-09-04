@@ -1,23 +1,43 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../models/User');
-//--------------------------------------------------------------------------------------
+//const User = require('../models/User');
+
+//const authenticateUser = (req, res, next) => {}
 
 router.get('/users', async (req, res) => {
     try {
-        const user = await Users.findByPk();
+        const user = await Users.findByPk(req.params.id);
         //await is not to move or do nothing until it gets the Users.findbyPK
         res.json(user);
-        });
+    
         //rendering the template, brings the books and title to the page
     } catch (err) {
-        res.sendStatus(500);
+        res.sendStatus(200);
     }
 });
 
+router.post('/user', async (req, res, next) => {
+    try {
+        const user = await Users.create(req.body)
+         res.redirect('/');
+//     } catch (err) {
+//         if (err.name === "SequelizeValidationError") {
+//             res.render('books/new-book', {
+//                 book: Books.build(req.body),
+//                 title: "New Book",
+//                 errors: err.errors
+//             });
+
+//         } else {
+//             res.render('error', err);
+//         }
+//     }
+// });
+
+
 // GET /books/new - Shows the create book form
-// router.get('/new', (req, res) =>
-//     res.render('books/new-book', {
+// router.get('/users', (req, res) =>
+//     res.render('user'), {
 //         book: Books.build(),
 //         title: "New Book"
 //     })
