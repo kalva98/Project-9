@@ -67,9 +67,15 @@ const authenticateUser = async (req, res, next) => {
 //     });
 // });
 
-// router.post('/users', async (req, res, next) =>
+// router.post('/users', async (req, res, next) => {
+//     try {
+//         const user = await 
+    
+//     }catch (err) {
+//         return next(err)
 
-// )
+//     }
+// })
 
 router.get('/users', authenticateUser, async (req, res) => {
     try {
@@ -79,7 +85,7 @@ router.get('/users', authenticateUser, async (req, res) => {
             }
         })
         //await is not to move or do nothing until it gets the Users.findbyPK
-        res.json(user);
+        res.json(user).status(200).end();
     }catch (err) {
         return next(err)
     }
