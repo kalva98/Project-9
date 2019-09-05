@@ -1,20 +1,16 @@
 'use strict'
 const Sequelize = require('sequelize');
 
-module.exports = (sequelize) => {
+module.exports = (sequelize, DataTypes) => {
     const Users = sequelize.define('Users', {
         id: {
-            type: Sequelize.INTEGER,
-            validate: {
-                notEmpty: {
-                    msg: "Title is required",
-                },
-                primaryKey: true,
-                autoIncrement: true,
-            },
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            autoIncrement: true,
+        
         },
         firstName: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             validate: {
                 notEmpty: {
                     msg: "Name is required",
@@ -22,7 +18,7 @@ module.exports = (sequelize) => {
             },
         },
         lastName: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             validate: {
                 notEmpty: {
                     msg: "Name is required",
@@ -30,17 +26,27 @@ module.exports = (sequelize) => {
             },
         },
         emailAddress: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
+            allowNull: false,
             validate: {
                 isEmail: {
                     msg: "Please enter a vaid email",
                 },
+                notNull: {
+                    msg: 'Email address is required'
+                }
             },
         },
         password: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
+            allowNull: false,
+            validate: {
+                notNull: {
+                    msg: 'Password is required'
+                }
+            }
         },
-    }, { sequelize });
+    }, {});
 
     Users.associate = (models) => {
         //creating a one to many relationship

@@ -5,27 +5,27 @@ module.exports = (sequelize) => {
     const Courses = sequelize.define('Courses', {
         id: {
             type: Sequelize.INTEGER,
-            validate: {
-                notEmpty: {
-                    msg: "Title is required",
-                },
-                primaryKey: true,
-                autoIncrement: true,
-            },
-        },
-        userId: {
-            type: Sequelize.INTEGER,
-            validate: {
-                notEmpty: {
-                    msg: "Author is required",
-                },
-            },
+            primaryKey: true,
+            autoIncrement: true
+            
         },
         title: {
             type: Sequelize.STRING,
+            allowNull: false,
+            validate: {
+                notNUll: {
+                    msg: 'Title is required'
+                }
+            },
         },
         description: {
             type: Sequelize.TEXT,
+            allowNull: false,
+            validate: {
+                notNUll: {
+                    msg: 'Description is required'
+                }
+            },
         },
         estimatedTime: {
             type: Sequelize.STRING,
@@ -35,10 +35,10 @@ module.exports = (sequelize) => {
             type: Sequelize.STRING,
             allowNull: true,
         },
-    }, { sequelize });
+    }, {});
 
-    Course.associate = (models) => {
-        Course.belongsTo(models.User, {
+    Courses.associate = (models) => {
+        Courses.belongsTo(models.Users, {
             as: 'user',
             foreignKey: {
                 fieldName: 'userId',

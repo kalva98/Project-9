@@ -4,6 +4,8 @@
 const express = require('express');
 const morgan = require('morgan');
 
+const { sequelize } = require('./db');
+
 // variable to enable global error logging
 const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'true';
 
@@ -54,3 +56,13 @@ app.set('port', process.env.PORT || 5000);
 const server = app.listen(app.get('port'), () => {
   console.log(`Express server is listening on port ${server.address().port}`);
 });
+
+sequelize
+  .authenticate()
+  .then(() => {
+    console.log("Connection has been established successfully");
+    return sequelize.sync();
+  })
+  .catch(err => {
+    console.error('Unable to connect to the database:", err')
+  });
