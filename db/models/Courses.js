@@ -13,7 +13,7 @@ module.exports = (sequelize) => {
             type: Sequelize.STRING,
             allowNull: false,
             validate: {
-                notNUll: {
+                notNull: {
                     msg: 'Title is required'
                 }
             },
@@ -22,7 +22,7 @@ module.exports = (sequelize) => {
             type: Sequelize.TEXT,
             allowNull: false,
             validate: {
-                notNUll: {
+                notNull: {
                     msg: 'Description is required'
                 }
             },
