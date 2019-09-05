@@ -59,18 +59,22 @@ const authenticateUser = async (req, res, next) => {
     }
 };
 
-router.get('/users', (req, res) => {
-    Users.findAll({
+// router.get('/users', (req, res) => {
+//     Users.findAll({
 
-    }).then((user) => {
-        res.json(user);
-    });
-});
-
-// router.get('/users', authenticateUser, async (req, res) => {
-//     const user = await Users.findByPk(req.body.id);
-//     //await is not to move or do nothing until it gets the Users.findbyPK
-//     res.json(user);
+//     }).then((user) => {
+//         res.json(user);
+//     });
 // });
+
+router.get('/users', authenticateUser, async (req, res) => {
+    const user = await Users.findByPk(req.body.id, {
+        attributes: {
+            exclude: ['password', 'createAt', 'updateAt'],
+        },
+    });
+    //await is not to move or do nothing until it gets the Users.findbyPK
+    res.json(user);
+})
 
 module.exports = router;
