@@ -4,7 +4,9 @@ const dbmodule = require('../db')
 const models = dbmodule.models
 const bcryptjs = require('bcryptjs');
 const auth = require('basic-auth');
-const {Courses, Users} = models
+const { Courses, Users } = models
+
+
 
 //User authentication middleware
 const authenticateUser = async (req, res, next) => {
@@ -67,15 +69,19 @@ const authenticateUser = async (req, res, next) => {
 //     });
 // });
 
-// router.post('/users', async (req, res, next) => {
-//     try {
-//         const user = await 
-    
-//     }catch (err) {
-//         return next(err)
+router.post('/users', async (req, res, next) => {
+    try {
+        const user = await User.create(req.body);
+        res.location('/');
+        res.status(201).end();
 
-//     }
-// })
+    } catch (err) {
+        error.status = 400;
+        return next(err);
+
+    }
+});
+
 
 router.get('/users', authenticateUser, async (req, res) => {
     try {

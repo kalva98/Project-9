@@ -3,9 +3,9 @@ const router = express.Router();
 //const Course = require('../models/Course');
 //--------------------------------------------------------------------------------------
 
-// router.get('/api/courses', async (req, res) => {
+// router.get('/courses', async (req, res) => {
 //     try {
-//         const books = await Books.findAll()
+//         const books = await Courses.findAll()
 //         //await is not to move or do nothing until it gets the books.findall
 //         res.render('books/index', {
 //             books: books,
@@ -16,6 +16,7 @@ const router = express.Router();
 //         res.sendStatus(200);
 //     }
 // });
+
 
 // // GET /books/new - Shows the create book form
 // router.get('/new', (req, res) =>
