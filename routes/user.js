@@ -61,27 +61,20 @@ const authenticateUser = async (req, res, next) => {
     }
 };
 
-// router.get('/users', (req, res) => {
-//     Users.findAll({
-
-//     }).then((user) => {
-//         res.json(user);
-//     });
-// });
-
-router.post('/users', async (req, res, next) => {
-    try {
-        const user = await User.create(req.body);
-        res.location('/');
-        res.status(201).end();
-
-    } catch (err) {
-        error.status = 400;
-        return next(err);
-
-    }
-});
-
+// router.post('/', (req, res) => {
+//     //If there is a password
+//     if (req.body.password) {
+//         //Hash the password and then attempt to create a new user
+//         req.body.password = bcryptjs.hashSync(req.body.password);
+//         //Model validations for User Model
+//         User.create(req.body);
+//         res.location('/');
+//         res.status(201).end();
+//     } else {
+//         //Respond with status 401
+//         res.status(401).end();
+//     }
+// })
 
 router.get('/users', authenticateUser, async (req, res) => {
     try {
@@ -96,5 +89,29 @@ router.get('/users', authenticateUser, async (req, res) => {
         return next(err)
     }
 })
+
+router.post('/users', async (req, res, next) => {
+    try {
+        const user = req.body;
+        if (user.password && user.firstName && user.lastName && user.emailAddress) {
+            user.password = bcryptjs.hashSync(user.password);
+            await User.create(user);
+            res.location('/');
+            res.status(201).end();
+            
+        } else {
+            res.status(400).end;
+        }
+
+    } catch (err) {
+        if (err.name === "sequelizeValidationError") {
+            console.log('Validation error')
+            res.status(400).end();
+        } else {
+            console.log('Error 500')
+            next(err);
+        }
+    }
+});
 
 module.exports = router;

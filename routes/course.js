@@ -1,103 +1,74 @@
 const express = require('express');
 const router = express.Router();
-//const Course = require('../models/Course');
-//--------------------------------------------------------------------------------------
+const dbmodule = require('../db')
+const models = dbmodule.models
+const bcryptjs = require('bcryptjs');
+const auth = require('basic-auth');
+const { Courses, Users } = models
 
-// router.get('/courses', async (req, res) => {
-//     try {
-//         const books = await Courses.findAll()
-//         //await is not to move or do nothing until it gets the books.findall
-//         res.render('books/index', {
-//             books: books,
-//             title: "Books"
-//         });
-//         //rendering the template, brings the books and title to the page
-//     } catch (err) {
-//         res.sendStatus(200);
-//     }
-// });
+const authenticateUser = async (req, res, next) => {
+    let message;
+    // Parse the user's credentials from the Authorization header.
+    const credentials = auth(req);
+    if (credentials) {
+        //Find user with matching email address
+        const user = await Users.findOne({
+            raw: true,
+            where: {
+                emailAddress: credentials.name,
+            },
+        });
+        //If user matches email
+        if (user) {
+            // Use the bcryptjs npm package to compare the user's password
+            // (from the Authorization header) to the user's password
+            // that was retrieved from the data store.
+            const authenticated = bcryptjs.compareSync(credentials.pass, user.password);
+            //If password matches
+            if (authenticated) {
+                console.log(`Authentication successful for user: ${user.firstName} ${user.lastName}`);
+                if (req.originalUrl.includes('courses')) {
+                    //If route has a courses endpoint, set request userId to matched user id
+                    req.body.userId = user.id;
+                } else if (req.originalUrl.includes('users')) {
+                    //If route has a users endpoint, set request id to matched user id
+                    req.body.id = user.id;
+                }
+            } else {
+                //Otherwise the Authentication failed
+                message = `Authentication failed for user: ${user.firstName} ${user.lastName}`;
+            }
+        } else {
+            // No email matching the Authorization header
+            message = `User not found for email address: ${credentials.name}`;
+        }
+    } else {
+        //No user credentials/authorization header available
+        message = 'Authorization header not found';
+    }
+    // Deny Access if there is anything stored in message
+    if (message) {
+        console.warn(message);
+        const err = new Error('Access Denied');
+        err.status = 401;
+        next(err);
+    } else {
+        //User authenticated
+        next();
+    }
+};
 
-
-// // GET /books/new - Shows the create book form
-// router.get('/new', (req, res) =>
-//     res.render('books/new-book', {
-//         book: Books.build(),
-//         title: "New Book"
-//     })
-// );
-
-// //simplified
-// //POST Creates a book
-// router.post('/new', async (req, res, next) => {
-//     try {
-//         await Books.create(req.body)
-//         res.redirect('/');
-//     } catch (err) {
-//         if (err.name === "SequelizeValidationError") {
-//             res.render('books/new-book', {
-//                 book: Books.build(req.body),
-//                 title: "New Book",
-//                 errors: err.errors
-//             });
-
-//         } else {
-//             res.render('error', err);
-//         }
-//     }
-// });
-
-// //simplified
-// router.get('/:id/update', async (req, res, next) => {
-//     try {
-//         const book = await Books.findByPk(req.params.id)
-//         res.render('books/update-book', {
-//             book: book,
-//             title: 'Edit Book'
-//         });
-
-//     } catch (err) {
-//         res.render('error', err);
-//     }
-// });
-
-// //POST /books/:id/delete - Deletes book from database.
-// router.post('/:id/delete', function (req, res, next) {
-//     Books.findByPk(req.params.id)
-//         .then(function (book) {
-//             if (book) {
-//                 return book.destroy();
-//             } else {
-//                 res.render('books/page-not-found');
+// router.get('/course' (req, res) => {
+//     Course.findAll{(
+//             attributes: {
+//                 exclude: ['id', 'title', 'decsription', 'estimatedTime', 'materialsNeeded'],
 //             }
-//         }).then(() => {
-//             res.redirect("/books");
-//         }).catch(function (err) {
-//             res.render('error', err);
-//         });
-// });
-
-// // //POST /books/:id/update - Updates book info in the database.
-// router.post('/:id/update', function (req, res, next) {
-//     Books.findByPk(req.params.id)
-//         .then(function (book) {
-//             if (book) {
-//                 return book.update(req.body);
-//             }
-//         }).then(function (article) {
-//             res.redirect("/");
-//         }).catch(function (err) {
-//             if (err.name === "SequelizeValidationError") {
-//                 let book = Books.build(req.body);
-//                 res.render("books/update-book", {
-//                     book: book,
-//                     errors: err.errors
-//                 });
-//             } else {
-//                 throw err;
-//             }
-//         }).catch(function (err) {
-//             res.render('error', err)
-//         });
-// });
+//         })
+//         //await is not to move or do nothing until it gets the Users.findbyPK
+//         res.json(user).status(200).end();
+//     } catch (err) {
+//         return next(err)
+//     }
+// })
 
 module.exports = router;
