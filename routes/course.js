@@ -59,28 +59,28 @@ const authenticateUser = async (req, res, next) => {
 };
 
 //GET/api/courses200
- router.get('/', async(req, res) => {
-     const courses = await Course.findAll{(
-             attributes: {
-                 exclude: ['createAt', 'updateAt'],
-             },
-                include: [{
-                    model: User,
-                    as: 'user',
-                    attributes: ['id', 'firstName', 'lastName', 'emailAddress'],
+ router.get('/courses', async(req, res) => {
+     const courses = await Courses.findAll({
+        attributes: {
+            exclude: ['createAt', 'updateAt'],
+        },
+        include: [{
+        model: Users,
+        as: 'user',
+        attributes: ['id', 'firstName', 'lastName', 'emailAddress'],
          }]
         })
          res.json(courses)
        })
        
-router.get('/:id', async(req,res, next) => {
-    const course = await Course.findOne({
+router.get('/courses/:id', async(req,res, next) => {
+    const course = await Courses.findOne({
         where: {
             id: req.params.id
         },
         attributes: ['id', 'title', 'description', 'estimatedTime', 'materialsNeeded', 'userId'],
         include: [{
-            model: User,
+            model: Users,
             as: 'user',
             attributes: ['id', 'firstName', 'lastName', 'emailAddress']
         }]
@@ -88,10 +88,10 @@ router.get('/:id', async(req,res, next) => {
     res.json(course);
 })
      
-router.post('/', async (req, res, next) => {
+router.post('/courses', authenticateUser, async (req, res, next) => {
     try{
         if(req.body.title && req.body.description) {
-        const createCourse = await Course.create(req.body);
+        const createCourse = await Courses.create(req.body);
         res.location(`api/courses/${createCourse.id}`);
         res.status(201).end();
         }else{
@@ -105,23 +105,46 @@ router.post('/', async (req, res, next) => {
     }
 })
      
-router.put('/course/:id', async (req, res) => {
-    const course = await Course.findbyPK(req.params.id)
-    if(course.id === req.body.id) {
-        await course.update(req.body);
-        res.status(204).end();
+router.put('/courses/:id', authenticateUser, async (req, res) => {
+    try {
+        const course = await Courses.findByPk(req.params.id)
+        if (course.id === req.body.id) {
+            if (req.body.title && req.body.description) {
+                req.body.estimatedTime === req.body.estimatedTime &&
+                    req.body.materialsNeeded === req.body.materialsNeeded
+                await course.update(req.body);
+                res.status(204).end();
+        } else {
+                res.status(400).json({ message: 'Missing Information' });
+        }
     } else {
-        res.status(401).json({message: "You are not authorized to make changes."});
+        res.status(403).json({ message: "You are not authorized to make changes." });
     }
-})
-     
-router.delete('/courses/:id', authenticatedUser, async (req, res, next) => {
-    const course = await Course.findbyPK (req.params.id)
-    if(course) {
-        await course.destroy();
-        res.status(204).end();
+} catch (error) {
+    if (error.name === 'SequelizeValidationError') {
+        res.status(404).json({ error: error.message })
+        
     } else {
-        res.status(401).json({message: "You are not authorized to delete this course."});
+        return next(error)
+        
+    }
+    }
+
+});
+
+     
+router.delete('/courses/:id', authenticateUser, async (req, res, next) => {
+    try {
+        const course = await Courses.findByPk(req.params.id)
+        if (course) {
+            await course.destroy();
+            
+        } else {
+            res.status(404).end();
+        }
+        res.status(204).end();
+    } catch (error) {
+        return next(error)
     }
 })
         

@@ -4,7 +4,15 @@ const dbmodule = require('../db')
 const models = dbmodule.models
 const bcryptjs = require('bcryptjs');
 const auth = require('basic-auth');
-const { Courses, Users } = models
+const {
+    Courses,
+    Users
+} = models
+const bodyParser = require('body-parser');
+router.use(bodyParser.json());
+router.use(bodyParser.urlencoded({
+    extended: false
+}));
 
 
 
@@ -61,55 +69,42 @@ const authenticateUser = async (req, res, next) => {
     }
 };
 
-// router.post('/', (req, res) => {
-//     //If there is a password
-//     if (req.body.password) {
-//         //Hash the password and then attempt to create a new user
-//         req.body.password = bcryptjs.hashSync(req.body.password);
-//         //Model validations for User Model
-//         User.create(req.body);
-//         res.location('/');
-//         res.status(201).end();
-//     } else {
-//         //Respond with status 401
-//         res.status(401).end();
-//     }
-// })
-
 router.get('/users', authenticateUser, async (req, res) => {
     try {
-         const user = await Users.findByPk(req.body.id, {
+        const user = await Users.findByPk(req.body.id, {
             attributes: {
                 exclude: ['password', 'createAt', 'updateAt'],
             }
         })
         //await is not to move or do nothing until it gets the Users.findbyPK
         res.json(user).status(200).end();
-    }catch (err) {
+    } catch (err) {
         return next(err)
     }
 })
 
-router.post('/users', async (req, res, next) => {
+router.post('/users', async (req, res) => {
     try {
         const user = req.body;
         if (user.password && user.firstName && user.lastName && user.emailAddress) {
-            user.password = bcryptjs.hashSync(user.password);
-            await User.create(user);
+            req.body.password = bcryptjs.hashSync(req.body.password);
+
+            await Users.create(user);
             res.location('/');
             res.status(201).end();
-            
-        } else {
-            res.status(400).end;
-        }
 
+        } else {
+            res.status(400).json({
+                message: 'information missing'
+            }).end();
+        }
     } catch (err) {
-        if (err.name === "sequelizeValidationError") {
+        if (err.name === 'SequelizeValidationError') {
             console.log('Validation error')
-            res.status(400).end();
+
         } else {
             console.log('Error 500')
-            next(err);
+
         }
     }
 });
