@@ -104,5 +104,26 @@ router.post('/', async (req, res, next) => {
         next(err);
     }
 })
+     
+router.put('/course/:id', async (req, res) => {
+    const course = await Course.findbyPK(req.params.id)
+    if(course.id === req.body.id) {
+        await course.update(req.body);
+        res.status(204).end();
+    } else {
+        res.status(401).json({message: "You are not authorized to make changes."});
+    }
+})
+     
+router.delete('/courses/:id', authenticatedUser, async (req, res, next) => {
+    const course = await Course.findbyPK (req.params.id)
+    if(course) {
+        await course.destroy();
+        res.status(204).end();
+    } else {
+        res.status(401).json({message: "You are not authorized to delete this course."});
+    }
+})
+        
 
 module.exports = router;
