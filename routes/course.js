@@ -58,17 +58,51 @@ const authenticateUser = async (req, res, next) => {
     }
 };
 
-// router.get('/course' (req, res) => {
-//     Course.findAll{(
-//             attributes: {
-//                 exclude: ['id', 'title', 'decsription', 'estimatedTime', 'materialsNeeded'],
-//             }
-//         })
-//         //await is not to move or do nothing until it gets the Users.findbyPK
-//         res.json(user).status(200).end();
-//     } catch (err) {
-//         return next(err)
-//     }
-// })
+//GET/api/courses200
+ router.get('/', async(req, res) => {
+     const courses = await Course.findAll{(
+             attributes: {
+                 exclude: ['createAt', 'updateAt'],
+             },
+                include: [{
+                    model: User,
+                    as: 'user',
+                    attributes: ['id', 'firstName', 'lastName', 'emailAddress'],
+         }]
+        })
+         res.json(courses)
+       })
+       
+router.get('/:id', async(req,res, next) => {
+    const course = await Course.findOne({
+        where: {
+            id: req.params.id
+        },
+        attributes: ['id', 'title', 'description', 'estimatedTime', 'materialsNeeded', 'userId'],
+        include: [{
+            model: User,
+            as: 'user',
+            attributes: ['id', 'firstName', 'lastName', 'emailAddress']
+        }]
+    })
+    res.json(course);
+})
+     
+router.post('/', async (req, res, next) => {
+    try{
+        if(req.body.title && req.body.description) {
+        const createCourse = await Course.create(req.body);
+        res.location(`api/courses/${createCourse.id}`);
+        res.status(201).end();
+        }else{
+            res.status(400).json({
+                message: 'Error 400 - Bad request - Missing information.',
+            });
+        }
+    }catch (err) {
+        console.log("Error 401 - Unauthorized Request");
+        next(err);
+    }
+})
 
 module.exports = router;
