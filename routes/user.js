@@ -69,6 +69,8 @@ const authenticateUser = async (req, res, next) => {
     }
 };
 
+//GET/api/users 200
+//Returns the currently authenticated user
 router.get('/users', authenticateUser, async (req, res) => {
     try {
         const user = await Users.findByPk(req.body.id, {
@@ -76,24 +78,29 @@ router.get('/users', authenticateUser, async (req, res) => {
                 exclude: ['password', 'createAt', 'updateAt'],
             }
         })
-        //await is not to move or do nothing until it gets the Users.findbyPK
         res.json(user).status(200).end();
     } catch (err) {
         return next(err)
     }
 })
 
+//POST/api/users 201
+//Creates a user, sets the Location header to "/", and returns no content
 router.post('/users', async (req, res) => {
     try {
+        //get the user from the request body
         const user = req.body;
         if (user.password && user.firstName && user.lastName && user.emailAddress) {
             req.body.password = bcryptjs.hashSync(req.body.password);
-
+            //validation creating new user
             await Users.create(user);
+            //sets location header to "/"
             res.location('/');
+            //if sucessful return a 201 status
             res.status(201).end();
 
         } else {
+            //if not successful return a 400 error
             res.status(400).json({
                 message: 'information missing'
             }).end();

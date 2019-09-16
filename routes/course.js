@@ -59,6 +59,7 @@ const authenticateUser = async (req, res, next) => {
 };
 
 //GET/api/courses200
+//Returns a list of courses (including the user that owns each course)
  router.get('/courses', async(req, res) => {
      const courses = await Courses.findAll({
         attributes: {
@@ -72,7 +73,9 @@ const authenticateUser = async (req, res, next) => {
         })
          res.json(courses)
        })
-       
+
+//GET/api/courses/:id 200
+//Returns a course (including the user that owns the course) for the provided course ID      
 router.get('/courses/:id', async(req,res, next) => {
     const course = await Courses.findOne({
         where: {
@@ -87,7 +90,9 @@ router.get('/courses/:id', async(req,res, next) => {
     })
     res.json(course);
 })
-     
+
+//POST/api/courses 201
+//Creates a course, sets the Location header to the URI for the course, and returns no content
 router.post('/courses', authenticateUser, async (req, res, next) => {
     try{
         if(req.body.title && req.body.description) {
@@ -104,7 +109,9 @@ router.post('/courses', authenticateUser, async (req, res, next) => {
         next(err);
     }
 })
-     
+
+//PUT/api/courses/:id 204
+//Updates a course and returns no content
 router.put('/courses/:id', authenticateUser, async (req, res) => {
     try {
         const course = await Courses.findByPk(req.params.id)
@@ -129,10 +136,10 @@ router.put('/courses/:id', authenticateUser, async (req, res) => {
         
     }
     }
-
 });
 
-     
+//DELETE/api/courses/:id 204
+//Deletes a course and returns no content     
 router.delete('/courses/:id', authenticateUser, async (req, res, next) => {
     try {
         const course = await Courses.findByPk(req.params.id)
